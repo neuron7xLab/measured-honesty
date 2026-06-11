@@ -22,7 +22,7 @@ as a standing limitation. Nothing is hand-waved.
 | S-2 | **ECE** computed on 5 bins over 16 points — statistically meaningless. | **FIXED** — `ece_underpowered = True` flag; README marks ECE indicative-only. |
 | S-3 | The LLM's `P(stop)` is **hand-mapped** from its discrete verdict, so its Brier reflects that map, not the model's own probability. | **DISCLOSED** — stated in `caveats` and README. |
 | S-4 | Calibration **routing selects on the same gold set it is scored on** (in-sample, no held-out split). | **DISCLOSED** — `selection_rule` and caveats say "in-sample"; an unbiased estimate needs a held-out split. |
-| S-5 | Gold labels are **author-authored** (single annotator); no inter-annotator agreement. | **DISCLOSED** — operating-point measurement, not a generalisation guarantee. |
+| S-5 | Gold labels are **author-authored** (single annotator); no inter-annotator agreement. | **PARTLY ADDRESSED** — added `mh/benchmark_snli.py`: the NLI critic on real SNLI (human gold, open) scores **0.904 acc / 0.904 macro-F1** on n=250. Honest scope: in-distribution (model trained on SNLI+MNLI), not zero-shot. The other gold sets remain author-authored. |
 
 ## Naming / honesty gaps (the project's own thesis)
 

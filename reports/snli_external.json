@@ -1,0 +1,27 @@
+{
+  "status": "EXECUTED",
+  "dataset": "stanfordnlp/snli (test split, human gold, CC BY-SA 4.0)",
+  "n": 250,
+  "seed": 0,
+  "model": "cross-encoder/nli-MiniLM2-L6-H768",
+  "accuracy": 0.904,
+  "macro_f1": 0.904,
+  "confusion_true_rows_ent_neu_con": [
+    [
+      72,
+      6,
+      1
+    ],
+    [
+      6,
+      73,
+      5
+    ],
+    [
+      0,
+      6,
+      81
+    ]
+  ],
+  "caveat": "model was trained on the SNLI+MNLI family -> this is IN-DISTRIBUTION accuracy on a held-out test split, NOT zero-shot transfer. It is the only measurement here on data not authored in this repo (closes limitation S-5 for the NLI agent)."
+}

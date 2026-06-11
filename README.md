@@ -101,6 +101,20 @@ Self-tunes a fidelity threshold on a 12-item set: held-out F1 **0.0 → 0.8** (n
 +0.8), **0 regressions**; the Goodhart bait (predict-all-faithful, which a naive
 recall-optimiser would select) is **blocked by the tripwire** (1 event caught).
 
+### External validity — real open data (`mh/benchmark_snli.py`)
+Every gold set above is author-authored (limitation S-5). The one measurement on
+data nobody here wrote: the NLI critic on **SNLI** (Stanford NLI test split, human
+gold, CC BY-SA 4.0), pulled live from the HuggingFace parquet mirror.
+
+| dataset | n | accuracy | macro-F1 |
+|---|---|---|---|
+| SNLI test (human gold) | 250 | **0.904** | **0.904** |
+
+**Honest scope:** the model (`cross-encoder/nli-MiniLM2`) was trained on the
+SNLI+MNLI family, so this is **in-distribution** accuracy on a held-out split —
+**not** zero-shot transfer. It confirms the NLI wrapper reproduces the canonical
+task on canonical open data; it is not a generalisation claim. `make snli`.
+
 ---
 
 ## 2. Falsification bounds (where it breaks)
