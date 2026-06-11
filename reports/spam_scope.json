@@ -1,0 +1,16 @@
+{
+  "status": "EXECUTED",
+  "dataset": "ucirvine/sms_spam (open, CC BY 4.0)",
+  "n": 800,
+  "seed": 0,
+  "spam_recall": 0.0083,
+  "ham_specificity": 0.9971,
+  "accuracy": 0.8475,
+  "confusion": {
+    "tn": 677,
+    "fp": 2,
+    "fn": 120,
+    "tp": 1
+  },
+  "interpretation": "SCOPE BOUNDARY, not a failure. The §9 guard targets marketing-manipulation, not generic spam; near-zero spam recall with high ham specificity is the expected, honest result. Do NOT use this guard as a spam classifier."
+}

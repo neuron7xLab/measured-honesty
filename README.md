@@ -115,6 +115,19 @@ SNLI+MNLI family, so this is **in-distribution** accuracy on a held-out split �
 **not** zero-shot transfer. It confirms the NLI wrapper reproduces the canonical
 task on canonical open data; it is not a generalisation claim. `make snli`.
 
+And the deliberately **unflattering** counterpart — the §9 safety guard on real
+SMS spam (`mh/benchmark_spam.py`, UCI SMS Spam Collection, CC BY 4.0):
+
+| dataset | n | spam recall | ham specificity |
+|---|---|---|---|
+| SMS Spam (open) | 800 | **0.008** | **0.997** |
+
+This is a **scope boundary, not a failure.** The keyword guard targets
+marketing-*manipulation* (fabricated proof, fear-bait, impersonation, viral hype),
+not generic spam — so it recalls almost no SMS spam while almost never
+false-alarming on ham. A measured negative pins the tool's scope instead of
+letting anyone assume it is a spam classifier. `make spam`.
+
 ---
 
 ## 2. Falsification bounds (where it breaks)

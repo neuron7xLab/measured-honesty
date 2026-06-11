@@ -1,6 +1,6 @@
 PY ?= python3
 
-.PHONY: verify test lint type report viz snli clean
+.PHONY: verify test lint type report viz snli spam clean
 
 # Pure tasks (T1/T3/T5) run anywhere; T2/T4 gated behind AOS_LLM_TESTS=1 + stack.
 verify: lint type test report
@@ -11,6 +11,9 @@ viz:
 
 snli:
 	$(PY) -m mh.benchmark_snli
+
+spam:
+	$(PY) -m mh.benchmark_spam
 
 lint:
 	$(PY) -m ruff check mh tests
