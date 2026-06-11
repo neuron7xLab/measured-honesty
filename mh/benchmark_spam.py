@@ -10,6 +10,7 @@ because "you won a prize, call now" is not a §9 manipulation pattern.
 A measured negative is a product: this empirically pins the guard's scope instead
 of letting anyone assume it catches spam.
 """
+
 from __future__ import annotations
 
 import io
@@ -18,8 +19,7 @@ import urllib.request
 from mh.safety_filter import detect_blocked
 
 PARQUET_URL = (
-    "https://huggingface.co/api/datasets/ucirvine/sms_spam/parquet/"
-    "plain_text/train/0.parquet"
+    "https://huggingface.co/api/datasets/ucirvine/sms_spam/parquet/plain_text/train/0.parquet"
 )
 
 

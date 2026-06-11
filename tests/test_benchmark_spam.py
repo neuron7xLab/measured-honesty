@@ -1,4 +1,5 @@
 """Scope-boundary test — §9 guard on real SMS spam. Opt-in (network)."""
+
 import os
 
 import pytest

@@ -1,4 +1,5 @@
 """External-validity test — NLI critic on real SNLI. Opt-in (network + stack)."""
+
 import os
 
 import pytest
