@@ -1,10 +1,13 @@
 PY ?= python3
 
-.PHONY: verify test lint type report clean
+.PHONY: verify test lint type report viz clean
 
 # Pure tasks (T1/T3/T5) run anywhere; T2/T4 gated behind AOS_LLM_TESTS=1 + stack.
 verify: lint type test report
 	@echo "VERIFY: complete"
+
+viz:
+	$(PY) -m mh.viz
 
 lint:
 	$(PY) -m ruff check mh tests

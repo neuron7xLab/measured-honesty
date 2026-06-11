@@ -12,7 +12,14 @@ confidence intervals. A full self-audit is in [`AUDIT.md`](AUDIT.md).
 ```
 make verify        # ruff + mypy + pure tests (T1/T3/T5) + report   (no GPU)
 make report        # writes artifacts/research_report.json
+make viz           # regenerate the lattice diagrams (deterministic SVG)
 ```
+
+<p align="center"><img src="docs/evidence_lattice.svg" alt="evidence strength lattice" width="440"></p>
+
+The crown is **T1**: evidence strength is a bounded **distributive lattice**, so
+"verified delegation" becomes algebra. Formal note with theorems and proofs:
+**[`LATTICE.md`](LATTICE.md)**.
 
 ---
 
