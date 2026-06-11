@@ -81,6 +81,15 @@ Fleiss κ = 0.163. *ECE is **underpowered** at n=16 (5 bins) — indicative only
 The LLM's `P(stop)` is mapped from its discrete verdict, so its Brier reflects
 that map, not the model's own probability.
 
+**Routing — in-sample vs held-out (generalisation).** The in-sample routed
+accuracy (select + score on the same set) is the *benchmark-brilliance trap*. The
+honest number is **leave-one-out**: select the argmin-Brier agent on the train
+fold, predict the held-out point. It is still **1.0**, but its **Wilson CI is
+[0.806, 1.0]** at n=16 — a point estimate is not a generalisation claim. (A naive
+percentile bootstrap would lie [1.0, 1.0] here; it degenerates at the all-success
+boundary, so Wilson is used. Aligned with Sutskever: *benchmark brilliance ≠
+real-world generalisation* — the constraint is generalisation, not the score.)
+
 ### T4 — Verification scaling **curve** (`mh/verification_scaling.py`, needs the stack)
 Routed verification quality vs verifier compute (relative units, **not** FLOPs).
 This is a **4-point observation on one n=16 set, not a law**:

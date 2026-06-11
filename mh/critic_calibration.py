@@ -223,6 +223,32 @@ def evaluate() -> dict:
         "brier": brier_of[routed_name],
     }
 
+    # S-4 FIX — held-out routing (leave-one-out): the in-sample routed accuracy is
+    # the benchmark-brilliance trap (select and score on the same data). For each
+    # point, select argmin-Brier on the OTHER points, then predict the held-out
+    # one. This is an unbiased generalisation estimate; its bootstrap CI shows that
+    # at n=16 the point estimate cannot be trusted as generalisation.
+    loo_correct: list[float] = []
+    for i in range(n):
+        others = [j for j in range(n) if j != i]
+        y_tr = labels[others]
+        pick = min(names, key=lambda a: brier_score_loss(y_tr, probs[a][others]))
+        pred_i = int(probs[pick][i] >= 0.5)
+        loo_correct.append(1.0 if pred_i == int(labels[i]) else 0.0)
+    loo_hits = int(sum(loo_correct))
+    routed_holdout = {
+        "method": "leave-one-out: argmin-Brier agent chosen on the train fold",
+        "accuracy": round(loo_hits / n, 4),
+        # Wilson is the honest interval at the all-success boundary; the percentile
+        # bootstrap degenerates to [1,1] on an all-1 vector and would LIE about
+        # certainty. We report Wilson as primary and show the degenerate bootstrap.
+        "wilson_ci95": list(stats.wilson_ci(loo_hits, n)),
+        "bootstrap_ci95_degenerate": list(stats.bootstrap_mean_ci(loo_correct)),
+        "note": "even held-out the routed estimate is high, but at n=16 the Wilson "
+        "CI cannot exclude ~0.81 — a point estimate is not a generalisation claim "
+        "(Sutskever: benchmark-brilliance != real-world generalisation).",
+    }
+
     return {
         "status": "EXECUTED",
         "n_gold": len(GOLD),
@@ -235,8 +261,9 @@ def evaluate() -> dict:
             "indicative only, not a precise number.",
             "LLM P(stop) is mapped from the discrete verdict (reject/regenerate/"
             "approve), not the model's own probability -> its Brier reflects that map.",
-            "routing selects argmin-Brier on the SAME set it is scored on (in-sample); "
-            "a held-out split would be needed for an unbiased routing estimate.",
+            "calibration_routed is IN-SAMPLE (select+score on the same set) — the "
+            "benchmark-brilliance trap; calibration_routed_holdout is the unbiased "
+            "leave-one-out generalisation estimate, with a bootstrap CI.",
         ],
         "agents": names,
         "per_agent": per_agent,
@@ -247,6 +274,7 @@ def evaluate() -> dict:
         "weighted_ensemble": weighted,
         "weighted_lift_over_best_single": round(weighted_acc - best_single, 4),
         "calibration_routed": routed,
+        "calibration_routed_holdout": routed_holdout,
         "routed_lift_over_best_single": round(routed_acc - best_single, 4),
         "finding": "a miscalibrated adversary (red) sinks the NAIVE mean below the "
         "best single agent; calibration-WEIGHTING does not recover it because one "

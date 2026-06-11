@@ -21,7 +21,7 @@
       "n=16 is an OPERATING-POINT measurement, not a generalisation claim; per-agent accuracy carries a 95% Wilson CI (accuracy_ci95).",
       "ECE is computed on 5 bins over n=16 -> underpowered; treat ECE as indicative only, not a precise number.",
       "LLM P(stop) is mapped from the discrete verdict (reject/regenerate/approve), not the model's own probability -> its Brier reflects that map.",
-      "routing selects argmin-Brier on the SAME set it is scored on (in-sample); a held-out split would be needed for an unbiased routing estimate."
+      "calibration_routed is IN-SAMPLE (select+score on the same set) — the benchmark-brilliance trap; calibration_routed_holdout is the unbiased leave-one-out generalisation estimate, with a bootstrap CI."
     ],
     "agents": [
       "deterministic",
@@ -111,6 +111,19 @@
       "selection_rule": "argmin Brier on the SAME gold set (in-sample; no held-out split)",
       "accuracy": 1.0,
       "brier": 0.019374999999999996
+    },
+    "calibration_routed_holdout": {
+      "method": "leave-one-out: argmin-Brier agent chosen on the train fold",
+      "accuracy": 1.0,
+      "wilson_ci95": [
+        0.8064,
+        1.0
+      ],
+      "bootstrap_ci95_degenerate": [
+        1.0,
+        1.0
+      ],
+      "note": "even held-out the routed estimate is high, but at n=16 the Wilson CI cannot exclude ~0.81 — a point estimate is not a generalisation claim (Sutskever: benchmark-brilliance != real-world generalisation)."
     },
     "routed_lift_over_best_single": 0.0,
     "finding": "a miscalibrated adversary (red) sinks the NAIVE mean below the best single agent; calibration-WEIGHTING does not recover it because one agent strictly dominates; calibration-ROUTING (argmin Brier) does. Lesson: average raters when peers; ROUTE when one dominates.",
