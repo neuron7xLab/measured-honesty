@@ -44,6 +44,7 @@ def main() -> int:
         "T1_evidence_lattice": {
             "status": "EXECUTED",
             "is_bounded_lattice": L.is_bounded_lattice(),
+            "is_distributive": L.is_distributive(),
             "law_conjunction_is_meet": L.conjunction_strength([L.EXECUTED, L.ASSUMPTION])
             == L.ASSUMPTION,
             "law_failclosed_green": (
@@ -62,9 +63,10 @@ def main() -> int:
     t1 = report["T1_evidence_lattice"]
     t3 = report["T3_transfer_falsifier"]
     t5 = report["T5_breathing_loop"]
+    t3n = f"{t3['over_claims_caught']}/{t3['domains_audited']}"
     print(
         f"RESEARCH: T1 lattice={t1['is_bounded_lattice']} | "
-        f"T3 neuro_null={t3['neuro_null_reproduced']} ({t3['over_claims_caught']}/4) | "
+        f"T3 neuro_null={t3['neuro_null_reproduced']} ({t3n}) | "
         f"T5 gain={t5['net_gain']} goodhart_caught={t5['goodhart_events_caught']} | "
         f"T2/T4 {'EXECUTED' if models_live else 'BLOCKED'} -> {out}"
     )

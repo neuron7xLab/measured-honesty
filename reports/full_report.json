@@ -1,0 +1,243 @@
+{
+  "T1_evidence_lattice": {
+    "status": "EXECUTED",
+    "is_bounded_lattice": true,
+    "is_distributive": true,
+    "law_conjunction_is_meet": true,
+    "law_failclosed_green": true
+  },
+  "T2_critic_calibration": {
+    "status": "EXECUTED",
+    "n_gold": 16,
+    "ece_underpowered": true,
+    "environment": {
+      "sklearn": "1.8.0",
+      "llm_model": "qwen2.5:3b",
+      "sentence_transformers": "5.5.1",
+      "embed_model": "all-MiniLM-L6-v2",
+      "nli_model": "cross-encoder/nli-MiniLM2-L6-H768"
+    },
+    "caveats": [
+      "n=16 is an OPERATING-POINT measurement, not a generalisation claim; per-agent accuracy carries a 95% Wilson CI (accuracy_ci95).",
+      "ECE is computed on 5 bins over n=16 -> underpowered; treat ECE as indicative only, not a precise number.",
+      "LLM P(stop) is mapped from the discrete verdict (reject/regenerate/approve), not the model's own probability -> its Brier reflects that map.",
+      "routing selects argmin-Brier on the SAME set it is scored on (in-sample); a held-out split would be needed for an unbiased routing estimate."
+    ],
+    "agents": [
+      "deterministic",
+      "nli",
+      "llm",
+      "red"
+    ],
+    "per_agent": {
+      "deterministic": {
+        "accuracy": 0.6875,
+        "accuracy_ci95": [
+          0.444,
+          0.8584
+        ],
+        "precision": 1.0,
+        "recall": 0.375,
+        "f1": 0.5455,
+        "brier": 0.3125,
+        "ece": 0.3125
+      },
+      "nli": {
+        "accuracy": 0.9375,
+        "accuracy_ci95": [
+          0.7167,
+          0.9889
+        ],
+        "precision": 1.0,
+        "recall": 0.875,
+        "f1": 0.9333,
+        "brier": 0.0613,
+        "ece": 0.0972
+      },
+      "llm": {
+        "accuracy": 1.0,
+        "accuracy_ci95": [
+          0.8064,
+          1.0
+        ],
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "brier": 0.0194,
+        "ece": 0.1
+      },
+      "red": {
+        "accuracy": 0.5,
+        "accuracy_ci95": [
+          0.28,
+          0.72
+        ],
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6667,
+        "brier": 0.4034,
+        "ece": 0.3625
+      }
+    },
+    "pairwise_cohen_kappa": {
+      "deterministic~nli": 0.4576,
+      "deterministic~llm": 0.375,
+      "deterministic~red": 0.0,
+      "nli~llm": 0.875,
+      "nli~red": 0.0,
+      "llm~red": 0.0
+    },
+    "fleiss_kappa": 0.1634,
+    "naive_ensemble": {
+      "accuracy": 0.9375,
+      "brier": 0.0823,
+      "ece": 0.1841
+    },
+    "naive_lift_over_best_single": -0.0625,
+    "weighted_ensemble": {
+      "weights": {
+        "deterministic": 0.1558,
+        "nli": 0.3645,
+        "llm": 0.3994,
+        "red": 0.0802
+      },
+      "accuracy": 0.9375,
+      "brier": 0.0488,
+      "ece": 0.1692
+    },
+    "weighted_lift_over_best_single": -0.0625,
+    "calibration_routed": {
+      "selected_agent": "llm",
+      "selection_rule": "argmin Brier on the SAME gold set (in-sample; no held-out split)",
+      "accuracy": 1.0,
+      "brier": 0.019374999999999996
+    },
+    "routed_lift_over_best_single": 0.0,
+    "finding": "a miscalibrated adversary (red) sinks the NAIVE mean below the best single agent; calibration-WEIGHTING does not recover it because one agent strictly dominates; calibration-ROUTING (argmin Brier) does. Lesson: average raters when peers; ROUTE when one dominates.",
+    "note": "Brier/ECE = honesty of confidence; low Fleiss kappa driven by red"
+  },
+  "T3_transfer_falsifier": {
+    "status": "EXECUTED",
+    "domains_audited": 5,
+    "over_claims_caught": 4,
+    "neuro_null_reproduced": true,
+    "results": [
+      {
+        "domain": "software",
+        "admissible_strength": "EXECUTED",
+        "claimed": "EXECUTED",
+        "over_claim": false,
+        "admits_green": true
+      },
+      {
+        "domain": "neuroscience (ds003458-shaped null)",
+        "admissible_strength": "ASSUMPTION",
+        "claimed": "EXECUTED",
+        "over_claim": true,
+        "admits_green": false
+      },
+      {
+        "domain": "finance",
+        "admissible_strength": "ASSUMPTION",
+        "claimed": "SOURCE",
+        "over_claim": true,
+        "admits_green": false
+      },
+      {
+        "domain": "provider capability",
+        "admissible_strength": "UNKNOWN",
+        "claimed": "EXECUTED",
+        "over_claim": true,
+        "admits_green": false
+      },
+      {
+        "domain": "argumentation (incomparable claim)",
+        "admissible_strength": "SPECIFIED",
+        "claimed": "INFERENCE",
+        "over_claim": true,
+        "admits_green": false
+      }
+    ],
+    "note": "one calculus, four domains; the neuroscience over-claim is caught by the SAME meet law as the software one — inference-discipline transfer"
+  },
+  "T4_verification_scaling": {
+    "status": "EXECUTED",
+    "n_points": 4,
+    "n_gold": 16,
+    "curve": [
+      {
+        "n_verifiers": 1,
+        "stack": [
+          "deterministic"
+        ],
+        "compute_cost": 1,
+        "routed_accuracy": 0.6875,
+        "routed_pick": "deterministic",
+        "naive_accuracy": 0.6875
+      },
+      {
+        "n_verifiers": 2,
+        "stack": [
+          "deterministic",
+          "nli"
+        ],
+        "compute_cost": 11,
+        "routed_accuracy": 0.9375,
+        "routed_pick": "nli",
+        "naive_accuracy": 0.6875
+      },
+      {
+        "n_verifiers": 3,
+        "stack": [
+          "deterministic",
+          "nli",
+          "llm"
+        ],
+        "compute_cost": 111,
+        "routed_accuracy": 1.0,
+        "routed_pick": "llm",
+        "naive_accuracy": 0.875
+      },
+      {
+        "n_verifiers": 4,
+        "stack": [
+          "deterministic",
+          "nli",
+          "llm",
+          "red"
+        ],
+        "compute_cost": 211,
+        "routed_accuracy": 1.0,
+        "routed_pick": "llm",
+        "naive_accuracy": 0.9375
+      }
+    ],
+    "routed_saturates_at_n": 3,
+    "max_routed_accuracy": 1.0,
+    "naive_marginal_value_of_last_verifier": 0.0625,
+    "observation": "on THIS 4-point curve over a 16-item gold set (NOT a law): routed quality is monotone-non-decreasing and saturates at the first dominant well-calibrated verifier; the extra verifier adds 0 routed gain at ~2x compute. Naive averaging is non-monotone and underperforms routing.",
+    "caveat": "4 points, n=16, relative compute units (not measured FLOPs); an observation, not a scaling law."
+  },
+  "T5_breathing_loop": {
+    "status": "EXECUTED",
+    "start_val_f1": 0.0,
+    "final_val_f1": 0.8,
+    "net_gain": 0.8,
+    "final_threshold": 0.1,
+    "regressions": 0,
+    "naive_proxy_pick": -0.01,
+    "tripwire_blocked_degenerate": true,
+    "goodhart_events_caught": 1,
+    "trajectory": [
+      {
+        "threshold": 0.9,
+        "val_f1": 0.0
+      },
+      {
+        "threshold": 0.1,
+        "val_f1": 0.8
+      }
+    ],
+    "note": "a naive recall-optimiser would select the degenerate predict-all-faithful threshold; the tripwire blocks it and the loop retains an honest held-out F1 gain instead. Negation traps cap final F1 < 1.0 (proxy ceiling)."
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "T1_evidence_lattice": {
+    "status": "EXECUTED",
+    "is_bounded_lattice": true,
+    "is_distributive": true,
+    "law_conjunction_is_meet": true,
+    "law_failclosed_green": true
+  },
+  "T2_critic_calibration": {
+    "status": "BLOCKED",
+    "reason": "needs AOS_LLM_TESTS=1 + sentence-transformers + ollama"
+  },
+  "T3_transfer_falsifier": {
+    "status": "EXECUTED",
+    "domains_audited": 5,
+    "over_claims_caught": 4,
+    "neuro_null_reproduced": true,
+    "results": [
+      {
+        "domain": "software",
+        "admissible_strength": "EXECUTED",
+        "claimed": "EXECUTED",
+        "over_claim": false,
+        "admits_green": true
+      },
+      {
+        "domain": "neuroscience (ds003458-shaped null)",
+        "admissible_strength": "ASSUMPTION",
+        "claimed": "EXECUTED",
+        "over_claim": true,
+        "admits_green": false
+      },
+      {
+        "domain": "finance",
+        "admissible_strength": "ASSUMPTION",
+        "claimed": "SOURCE",
+        "over_claim": true,
+        "admits_green": false
+      },
+      {
+        "domain": "provider capability",
+        "admissible_strength": "UNKNOWN",
+        "claimed": "EXECUTED",
+        "over_claim": true,
+        "admits_green": false
+      },
+      {
+        "domain": "argumentation (incomparable claim)",
+        "admissible_strength": "SPECIFIED",
+        "claimed": "INFERENCE",
+        "over_claim": true,
+        "admits_green": false
+      }
+    ],
+    "note": "one calculus, four domains; the neuroscience over-claim is caught by the SAME meet law as the software one — inference-discipline transfer"
+  },
+  "T4_verification_scaling": {
+    "status": "BLOCKED",
+    "reason": "needs AOS_LLM_TESTS=1 + sentence-transformers + ollama"
+  },
+  "T5_breathing_loop": {
+    "status": "EXECUTED",
+    "start_val_f1": 0.0,
+    "final_val_f1": 0.8,
+    "net_gain": 0.8,
+    "final_threshold": 0.1,
+    "regressions": 0,
+    "naive_proxy_pick": -0.01,
+    "tripwire_blocked_degenerate": true,
+    "goodhart_events_caught": 1,
+    "trajectory": [
+      {
+        "threshold": 0.9,
+        "val_f1": 0.0
+      },
+      {
+        "threshold": 0.1,
+        "val_f1": 0.8
+      }
+    ],
+    "note": "a naive recall-optimiser would select the degenerate predict-all-faithful threshold; the tripwire blocks it and the loop retains an honest held-out F1 gain instead. Negation traps cap final F1 < 1.0 (proxy ceiling)."
+  }
+}
