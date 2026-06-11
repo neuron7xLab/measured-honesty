@@ -109,3 +109,32 @@ def test_conjunction_equals_weakest(classes: list[str]) -> None:
     # in a chain-with-diamond the meet of a set equals its weakest when totally
     # ordered; otherwise meet may be strictly below — never above
     assert L.leq(s, weakest)
+
+
+# --- canonical strengthenings (audit remediation) -----------------------
+def test_lattice_is_distributive() -> None:
+    assert L.is_distributive()
+
+
+@given(st.lists(cls, min_size=1))
+def test_disjunction_no_weaker_than_strongest_path(classes: list[str]) -> None:
+    d = L.disjunction_strength(classes)
+    for c in classes:
+        assert L.leq(c, d)  # best alternative path: conclusion >= every path
+
+
+@given(cls, cls)
+def test_admissible_iff_claimed_leq_admissible(claimed: str, admissible: str) -> None:
+    assert L.is_admissible(claimed, admissible) == L.leq(claimed, admissible)
+
+
+def test_incomparable_claim_is_inadmissible() -> None:
+    # INFERENCE claimed when only SPECIFIED admissible: incomparable -> inadmissible
+    assert L.is_admissible(L.INFERENCE, L.SPECIFIED) is False
+
+
+def test_invalid_class_raises() -> None:
+    import pytest
+
+    with pytest.raises(ValueError):
+        L.leq("BANANA", L.SOURCE)

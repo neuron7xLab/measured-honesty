@@ -135,6 +135,35 @@ def conjunction_strength(classes: list[str]) -> str:
     return reduce(meet, classes)
 
 
+def disjunction_strength(classes: list[str]) -> str:
+    """Strength under ALTERNATIVE evidence paths = JOIN (best path wins).
+    Empty disjunction is vacuously the bottom (no path supports it)."""
+    if not classes:
+        return BOTTOM
+    return reduce(join, classes)
+
+
+def is_admissible(claimed: str, admissible: str) -> bool:
+    """A claim is admissible iff claimed <= admissible. This flags BOTH a
+    strictly-too-strong claim AND a claim incomparable to (not below) the
+    admissible strength — the earlier strictly-above test missed the
+    incomparable case (claiming INFERENCE when only SPECIFIED is admissible)."""
+    return leq(claimed, admissible)
+
+
+def is_distributive() -> bool:
+    """Whether meet distributes over join and vice-versa across the carrier.
+    A distributive evidence lattice has no anomalous joins (no M3/N5)."""
+    for a in CLASSES:
+        for b in CLASSES:
+            for c in CLASSES:
+                if meet(a, join(b, c)) != join(meet(a, b), meet(a, c)):
+                    return False
+                if join(a, meet(b, c)) != meet(join(a, b), join(a, c)):
+                    return False
+    return True
+
+
 def strength_rank(evidence_class: str) -> int:
     """Total preorder index for display/sorting (not the partial order)."""
     _check(evidence_class)

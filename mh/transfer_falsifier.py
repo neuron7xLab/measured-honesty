@@ -57,8 +57,10 @@ def audit(inf: Inference) -> AuditResult:
     crit = [p.evidence_class for p in inf.premises if p.critical]
     admissible = L.conjunction_strength(crit) if crit else L.TOP
     claimed = inf.claimed_conclusion
-    # over-claim iff claimed strength is strictly above the admissible meet
-    over = L.leq(admissible, claimed) and not L.leq(claimed, admissible)
+    # over-claim iff the claim is NOT admissible (claimed <= admissible). This
+    # catches strictly-too-strong AND incomparable claims (a strictly-above-only
+    # test missed e.g. INFERENCE claimed when only SPECIFIED is admissible).
+    over = not L.is_admissible(claimed, admissible)
     return AuditResult(
         domain=inf.domain,
         admissible_strength=admissible,
@@ -105,6 +107,13 @@ CORPUS: tuple[Inference, ...] = (
             Premise("we made a live call", L.UNKNOWN),  # never executed
         ),
         claimed_conclusion=L.EXECUTED,
+    ),
+    Inference(
+        domain="argumentation (incomparable claim)",
+        description="claims INFERENCE strength from a SPECIFIED-only premise — "
+        "incomparable, missed by a strictly-above test, caught by is_admissible",
+        premises=(Premise("a design contract exists", L.SPECIFIED),),
+        claimed_conclusion=L.INFERENCE,
     ),
 )
 
