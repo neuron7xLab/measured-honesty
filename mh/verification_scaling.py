@@ -61,14 +61,18 @@ def evaluate() -> dict:
     sat = next(i + 1 for i, a in enumerate(routed_accs) if a >= max_routed)
     return {
         "status": "EXECUTED",
+        "n_points": len(curve),
+        "n_gold": len(labels),
         "curve": curve,
         "routed_saturates_at_n": sat,
         "max_routed_accuracy": round(max_routed, 4),
         "naive_marginal_value_of_last_verifier": marginal,
-        "law": "routed verification quality is monotone-non-decreasing and "
-        "SATURATES at the first dominant well-calibrated verifier; beyond "
-        "saturation, marginal routed gain is 0 at ~2x compute (measured). "
-        "Naive averaging is non-monotone and underperforms routing.",
+        "observation": "on THIS 4-point curve over a 16-item gold set (NOT a law): "
+        "routed quality is monotone-non-decreasing and saturates at the first "
+        "dominant well-calibrated verifier; the extra verifier adds 0 routed gain "
+        "at ~2x compute. Naive averaging is non-monotone and underperforms routing.",
+        "caveat": "4 points, n=16, relative compute units (not measured FLOPs); "
+        "an observation, not a scaling law.",
     }
 
 

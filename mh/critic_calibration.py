@@ -25,8 +25,24 @@ from sklearn.metrics import (
     precision_recall_fscore_support,
 )
 
-from mh import llm_critic, ollama_client, semantic_embed
+from mh import llm_critic, ollama_client, semantic_embed, stats
 from mh.safety_filter import detect_blocked
+
+
+def _environment() -> dict:
+    import sklearn
+
+    env = {"sklearn": sklearn.__version__, "llm_model": ollama_client.DEFAULT_MODEL}
+    try:
+        import sentence_transformers as st
+
+        env["sentence_transformers"] = st.__version__
+        env["embed_model"] = semantic_embed.EMBED_MODEL
+        env["nli_model"] = semantic_embed.NLI_MODEL
+    except Exception:  # noqa: BLE001
+        env["sentence_transformers"] = "absent"
+    return env
+
 
 THESIS = "phase synchronization is an early-warning signal for regime shifts"
 
@@ -137,13 +153,21 @@ def evaluate() -> dict:
     probs, labels = compute_probs()
     preds = {name: (p >= 0.5).astype(int) for name, p in probs.items()}
 
+    n = len(labels)
     per_agent = {}
+    acc_of: dict[str, float] = {}
+    brier_of: dict[str, float] = {}
     for name in agents:
         pr, rc, f1, _ = precision_recall_fscore_support(
             labels, preds[name], average="binary", zero_division=0
         )
+        acc = float(accuracy_score(labels, preds[name]))
+        brier = float(brier_score_loss(labels, probs[name]))
+        acc_of[name] = acc
+        brier_of[name] = brier
         per_agent[name] = {
-            "accuracy": round(float(accuracy_score(labels, preds[name])), 4),
+            "accuracy": round(acc, 4),
+            "accuracy_ci95": list(stats.wilson_ci(round(acc * n), n)),
             "precision": round(float(pr), 4),
             "recall": round(float(rc), 4),
             "f1": round(float(f1), 4),
@@ -173,7 +197,7 @@ def evaluate() -> dict:
     # CALIBRATION-WEIGHTED ensemble: weight each agent by (1 - 2*brier), clipped.
     # This is the principled fix for the measured finding that a miscalibrated
     # adversary drags a naive mean below the best single agent.
-    w = np.array([max(0.0, 1.0 - 2.0 * per_agent[n]["brier"]) for n in names])
+    w = np.array([max(0.0, 1.0 - 2.0 * brier_of[n]) for n in names])
     w = w / w.sum() if w.sum() > 0 else np.ones(len(names)) / len(names)
     wens_prob = np.sum([w[i] * probs[n] for i, n in enumerate(names)], axis=0)
     wens_pred = (wens_prob >= 0.5).astype(int)
@@ -186,22 +210,34 @@ def evaluate() -> dict:
         "ece": round(_ece(wens_prob, labels), 4),
     }
 
-    best_single = max(float(per_agent[n]["accuracy"]) for n in names)
+    best_single = max(acc_of[n] for n in names)
 
     # CALIBRATION-ROUTING: select the single best-calibrated agent (min Brier).
     # The honest fix when one agent strictly dominates — averaging dilutes it.
-    routed_name = min(names, key=lambda n: per_agent[n]["brier"])
-    routed_acc = float(per_agent[routed_name]["accuracy"])
+    routed_name = min(names, key=lambda n: brier_of[n])
+    routed_acc = acc_of[routed_name]
     routed = {
         "selected_agent": routed_name,
-        "selection_rule": "argmin Brier on held-out gold",
+        "selection_rule": "argmin Brier on the SAME gold set (in-sample; no held-out split)",
         "accuracy": routed_acc,
-        "brier": per_agent[routed_name]["brier"],
+        "brier": brier_of[routed_name],
     }
 
     return {
         "status": "EXECUTED",
         "n_gold": len(GOLD),
+        "ece_underpowered": stats.ece_is_underpowered(len(GOLD), bins=5),
+        "environment": _environment(),
+        "caveats": [
+            f"n={len(GOLD)} is an OPERATING-POINT measurement, not a generalisation "
+            "claim; per-agent accuracy carries a 95% Wilson CI (accuracy_ci95).",
+            "ECE is computed on 5 bins over n=16 -> underpowered; treat ECE as "
+            "indicative only, not a precise number.",
+            "LLM P(stop) is mapped from the discrete verdict (reject/regenerate/"
+            "approve), not the model's own probability -> its Brier reflects that map.",
+            "routing selects argmin-Brier on the SAME set it is scored on (in-sample); "
+            "a held-out split would be needed for an unbiased routing estimate.",
+        ],
         "agents": names,
         "per_agent": per_agent,
         "pairwise_cohen_kappa": pairwise,
