@@ -1,0 +1,21 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install ruff mypy -r requirements.txt
+      - name: lint
+        run: |
+          ruff check mh tests
+          ruff format --check mh tests
+      - name: type
+        run: mypy mh
+      - name: test (pure tasks; T2/T4 skip without the semantic stack)
+        run: pytest tests/ -q
+      - name: report (pure)
+        run: python -m mh.run_all
