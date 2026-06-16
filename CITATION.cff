@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "measured-honesty"
+abstract: >-
+  Five falsification studies of an instrument's own limits — every figure tied to an executed measurement with confidence intervals, or marked BLOCKED. Bounded evidence lattice, critic calibration, domain transfer, verification scaling curve, Goodhart-guarded self-improvement. 
+authors:
+  - family-names: "Vasylenko"
+    given-names: "Yaroslav"
+    email: "neuron7x@ukr.net"
+repository-code: "https://github.com/neuron7xLab/measured-honesty"
+url: "https://github.com/neuron7xLab/measured-honesty"
+license: MIT
