@@ -1,4 +1,4 @@
 # T2/T4 only. Reuses a system torch; add a local ollama chat model separately.
-sentence-transformers==5.5.1
+sentence-transformers==5.6.0
 # torch (system / your CUDA build) — not pinned here
 # + ollama server with: ollama pull qwen2.5:3b
