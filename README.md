@@ -2,6 +2,8 @@
 
 [![ci](https://github.com/neuron7xLab/measured-honesty/actions/workflows/ci.yml/badge.svg)](https://github.com/neuron7xLab/measured-honesty/actions/workflows/ci.yml)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![CodeQL](https://github.com/neuron7xLab/measured-honesty/actions/workflows/codeql.yml/badge.svg)](https://github.com/neuron7xLab/measured-honesty/actions/workflows/codeql.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/neuron7xLab/measured-honesty/badge)](https://scorecard.dev/viewer/?uri=github.com/neuron7xLab/measured-honesty)
 
 **Five falsification studies of an instrument's own limits.**
 Every figure below is produced by an executed measurement in this repo and is
